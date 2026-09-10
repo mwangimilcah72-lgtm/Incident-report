@@ -60,9 +60,9 @@ jwt = JWTManager(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'noreplyrescueapp@gmail.com'
-app.config['MAIL_PASSWORD'] = 'qzambnfrbjqpqlwp'
-app.config['MAIL_DEFAULT_SENDER'] = 'noreplyrescueapp@gmail.com'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER')
 
 mail = Mail(app)
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
@@ -227,15 +227,15 @@ class Signup(Resource):
         ''', 'html')
 
         msg['Subject'] = 'Confirm Your Email'
-        msg['From'] = 'noreplyrescueapp@gmail.com'
+        msg['From'] = app.config['MAIL_DEFAULT_SENDER']
         msg['To'] = email
 
         # Send the confirmation email
         try:
             with smtplib.SMTP('smtp.gmail.com', 587) as server:
                 server.starttls()
-                server.login('noreplyrescueapp@gmail.com', 'qzambnfrbjqpqlwp')  # Use your app password
-                server.sendmail('noreplyrescueapp@gmail.com', email, msg.as_string())
+                server.login(app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+                server.sendmail(app.config['MAIL_DEFAULT_SENDER'], email, msg.as_string())
                 print("Email sent successfully!")
         except Exception as e:
             print(f"Error sending email: {e}")
@@ -286,7 +286,7 @@ class ResendConfirmation(Resource):
         token = s.dumps(user.email, salt='email-confirm')
         link = url_for('confirm_email', token=token, _external=True)
 
-        msg = Message('Confirm Your Email', sender='kuriaisac@gmail.com', recipients=[user.email])
+        msg = Message('Confirm Your Email', sender=app.config['MAIL_DEFAULT_SENDER'], recipients=[user.email])
         msg.html = f'''
             <html>
                 <body>

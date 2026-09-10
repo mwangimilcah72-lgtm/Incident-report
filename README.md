@@ -60,7 +60,7 @@ To run this project, both the frontend and backend environments need to be set u
     
     
     
-    `$ git clone https://github.com/Inifinitech/Incident-report.git
+    `$ git clone https://github.com/mwangimilcah72-lgtm/Incident-report.git
     $ cd Incident-report 
     
 2.  Navigate to the */frontend* directory and install the necessary dependencies:
